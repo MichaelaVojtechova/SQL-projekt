@@ -24,5 +24,4 @@ LEFT JOIN (
 	GROUP BY prim.food_name, prim.price_year) price2
 	ON price.food_name = price2.food_name
 	AND price.price_year = price2.price_year + 1
-WHERE price.price_year != '2006'
 ;
