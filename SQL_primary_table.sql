@@ -1,3 +1,5 @@
+-- uživatelské jméno na Discordu Michaela V.#2711 --
+
 
 CREATE OR REPLACE TABLE t_michaela_vojtechova_project_sql_primary_final AS
 SELECT *
