@@ -4,31 +4,23 @@
  */
 
 SELECT
-	a.payroll_year,
-	a.average_pay_value,
-	a.average_price_value,
-	round((a.average_pay_value - b.average_pay_value) / b.average_pay_value * 100, 2) AS percent_pay_growth,
-	round((a.average_price_value - b.average_price_value) / b.average_price_value * 100, 2) AS percent_price_growth
+	b.payroll_year AS `year`,
+	b.average_payroll,
+	b.average_price,
+	round((b.average_payroll - b.pay_prev_year) / b.pay_prev_year * 100, 2) AS pay_percent_growth,
+	round((b.average_price - b.price_prev_year) / b.price_prev_year * 100, 2) AS price_percent_growth
 FROM (
 	SELECT
-	prim.branch_code,
-	prim.payroll_year,
-	round(avg(prim.payroll_value), 2) AS average_pay_value,
-	round(avg(prim.food_price), 2) AS average_price_value
-	FROM t_michaela_vojtechova_project_sql_primary_final prim
-	WHERE prim.payroll_value IS NOT NULL 
-		AND prim.food_price IS NOT NULL 
-	GROUP BY prim.payroll_year) a
-LEFT JOIN (
-	SELECT
-	prim.branch_code,
-	prim.payroll_year,
-	round(avg(prim.payroll_value), 2) AS average_pay_value,
-	round(avg(prim.food_price), 2) AS average_price_value
-	FROM t_michaela_vojtechova_project_sql_primary_final prim
-	WHERE prim.payroll_value IS NOT NULL 
-		AND prim.food_price IS NOT NULL 
-	GROUP BY prim.payroll_year) b 
-	ON a.branch_code = b.branch_code
-	AND a.payroll_year = b.payroll_year + 1
+		a.payroll_year,
+		a.average_payroll,
+		a.average_price,
+		LAG(a.average_payroll) OVER (ORDER BY a.payroll_year) AS pay_prev_year,
+		LAG(a.average_price) OVER (ORDER BY a.payroll_year) AS price_prev_year
+	FROM (
+		SELECT
+			prim.payroll_year,
+			round(avg(prim.payroll_value), 2) AS average_payroll,
+			round(avg(prim.food_price), 2) AS average_price
+		FROM t_michaela_vojtechova_project_sql_primary_final prim
+		GROUP BY prim.payroll_year) a) b
 ;
